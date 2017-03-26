@@ -1,2 +1,2 @@
-# onchapline
-onchapline telegram bot
+# clue
+telegram bot based game

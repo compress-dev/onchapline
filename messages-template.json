@@ -1,0 +1,8 @@
+{
+  "welcome": {
+    "text": "welcome to onchapline"
+  },
+  "registered": {
+    "text": "you registered. your name is {0}"
+  }
+}
