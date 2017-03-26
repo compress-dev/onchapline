@@ -25,12 +25,13 @@ debug = False
 FSM.init(collections)
 
 def FSMInput(member, message):
-
+    print(member)
     if member['state'] == 'null':
         FSM.stateNull(member, message)
     elif member['state'] == 'reg0':
-        FSM.reg0(member, message)
-
+        FSM.state_reg0(member, message)
+    elif member['state'] == 'ready':
+        FSM.state_ready(member, message)
     return True
 #   =========================================================================================
 #                                         DEBUG RUNNING
@@ -59,7 +60,7 @@ if __name__ == '__main__':
                 }
                 for m in collections['members'].find({"_id" : memberId}):
                     member = m
-                print(member)
+                
                 print("{1}> {0}".format(messageText, member['name']))
                 FSMResult = FSMInput(member, messageText)
 

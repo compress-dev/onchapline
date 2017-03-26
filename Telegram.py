@@ -43,7 +43,7 @@ def sendMessage(member , message = 'test(keyboard removed)', keyboard = {"remove
 
         allowedMessages = json.dumps(["message", "inline_query", "chosen_inline_result", "callback_query"])
         url += '&allowed_updates=' + allowedMessages
-        
+
         response = requests.get(url)
         content = response.content.decode("utf-8")
         jsonResult = json.loads(content)
@@ -69,5 +69,6 @@ def wellcomeMessage(member):
 
 def registered(member):
     message =  messagesTemplate["registered"]['text'].format(member['name'])
-    sendMessage(member, message)
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
 

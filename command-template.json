@@ -1,0 +1,20 @@
+{
+  "help": {
+    "text": "راهنما"
+  },
+  "search-product-title": {
+    "text": "جستجو براساس نام محصول"
+  },
+  "search-print-title": {
+    "text": "جستجو براساس نام محصول"
+  },
+  "search-full": {
+    "text": "جستجوی پیشرفته"
+  },
+  "all-orders": {
+    "text": "لیست تمام سفارشات"
+  },
+  "active-orders": {
+    "text": "لیست سفارشات در حال اجرا"
+  }
+}
