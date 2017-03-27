@@ -1,8 +1,47 @@
 {
-  "welcome": {
-    "text": "welcome to onchapline"
+  "name-require": {
+    "text": "please enter your name"
+  },
+  "phone-require": {
+    "text": "ok {0} please enter your phone number"
   },
   "registered": {
-    "text": "you registered. your name is {0}"
+    "text": "you registered. your name is {0}\nyour phone is {1}"
+  },
+  "help":{
+    "text": "/informations \n/advanced_search \n/about \n/all_orders \n/running_orders"
+  },
+  "search-product":{
+    "text": "please enter product title"
+  },
+  "product-message":{
+    "text": "product id {0} \ntitle: {1}\nscore: {2}\nprice: {3}\namount: {4}\nimage: {5}\nadd to cart /take_{0}"
+  },
+  "product-count":{
+    "text": "give us the amount or /cancel"
+  },
+  "more-products":{
+    "text": "for more products type /more"
+  },
+  "search-office":{
+    "text": "please enter print office title"
+  },
+  "search-advanced-score-min":{
+    "text": "please enter minimum score"
+  },
+  "search-advanced-score-max":{
+    "text": "please enter maximum score"
+  },
+  "search-advanced-price-min":{
+    "text": "please enter minimum price"
+  },
+  "search-advanced-price-max":{
+    "text": "please enter maximum price"
+  },
+  "search-advanced-price-accept":{
+    "text": "do you wanna search by price?"
+  },
+  "search-advanced-score-accept":{
+    "text": "do you wanna search by score?"
   }
 }

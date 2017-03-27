@@ -63,12 +63,75 @@ def getKeyboard(keyboardId):
 #   =========================================================================================
 
 #       REGISTRATION
-def wellcomeMessage(member):
-    message = messagesTemplate["welcome"]['text']
+def nameRequire(member):
+    message = messagesTemplate["name-require"]['text']
+    sendMessage(member, message)
+
+def phoneRequire(member):
+    message =  messagesTemplate["phone-require"]['text'].format(member['name'])
     sendMessage(member, message)
 
 def registered(member):
-    message =  messagesTemplate["registered"]['text'].format(member['name'])
+    message =  messagesTemplate["registered"]['text'].format(member['name'], member['phone'])
     keyboard = keyboardTemplate['normal']
     sendMessage(member, message, keyboard)
 
+def help(member):
+    message =  messagesTemplate["help"]['text']
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def searchByOffice(member):
+    message =  messagesTemplate["search-office"]['text'].format(member['name'])
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def searchByProduct(member):
+    message =  messagesTemplate["search-product"]['text'].format(member['name'])
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def searchAdvancedScoreMin(member):
+    message =  messagesTemplate["search-advanced-score-min"]['text'].format(member['name'])
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def searchAdvancedPriceMin(member):
+    message =  messagesTemplate["search-advanced-price-min"]['text'].format(member['name'])
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def searchAdvancedScoreMax(member):
+    message =  messagesTemplate["search-advanced-score-max"]['text'].format(member['name'])
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def searchAdvancedPriceMax(member):
+    message =  messagesTemplate["search-advanced-price-max"]['text'].format(member['name'])
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def searchAdvancedPriceAccept(member):
+    message =  messagesTemplate["search-advanced-price-max"]['text'].format(member['name'])
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def searchAdvancedScoreAccept(member):
+    message =  messagesTemplate["search-advanced-score-accept"]['text'].format(member['name'])
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def product(member, product):
+    message =  messagesTemplate["product-message"]['text'].format(product['id'], product['title'], product['score'], product['price'], product['amount'], product['image'])
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def moreProducts(member):
+    message =  messagesTemplate["more-products"]['text']
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def productCount(member):
+    message =  messagesTemplate["product-count"]['text']
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)

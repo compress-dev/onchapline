@@ -30,6 +30,16 @@ def FSMInput(member, message):
         FSM.stateNull(member, message)
     elif member['state'] == 'reg0':
         FSM.state_reg0(member, message)
+    elif member['state'] == 'reg1':
+        FSM.state_reg1(member, message)
+    elif member['state'] == 'ready':
+        FSM.state_ready(member, message)
+    elif member['state'] == 'search-product-title':
+        FSM.state_search_product_title(member, message)
+    elif member['state'] == 'take-product':
+        FSM.state_take_product(member, message)
+    elif member['state'] == 'ready':
+        FSM.state_ready(member, message)
     elif member['state'] == 'ready':
         FSM.state_ready(member, message)
     return True
@@ -56,7 +66,8 @@ if __name__ == '__main__':
                 member = {
                     '_id'  : memberId,
                     'name' : 'null',
-                    'state': 'null'
+                    'state': 'null',
+                    'state_extra': {}
                 }
                 for m in collections['members'].find({"_id" : memberId}):
                     member = m
