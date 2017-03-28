@@ -23,6 +23,27 @@
   "more-products":{
     "text": "for more products type /more"
   },
+  "order-description":{
+    "text": "you are ordering {0} of {1} to {2}.any description about this order?\notherwise type /cancel"
+  },
+  "order-file":{
+    "text": "okay! now upload your files after finished file upload type /upload_finish or if you wannted to quit just type /cancel"
+  },
+  "order-file-again":{
+    "text": "if your uploads are finished use /upload_finish. otherwise use /cancel to cancel progress or continue uploading"
+  },
+  "cart-acceptable":{
+    "text": "you have {0} orders in your cart. if you want to accept it use /accept_cart"
+  },
+  "cart-address":{
+    "text": "please enter your address or use GPS to give us otherwise use /cancel"
+  },
+  "cart-info-accept":{
+    "text": "cart informations ... \ndo you accept it? /yes /no"
+  },
+  "cart-acception-done":{
+    "text": "your cart sent, we'll notify you:)"
+  },
   "search-office":{
     "text": "please enter print office title"
   },

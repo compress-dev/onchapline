@@ -135,3 +135,50 @@ def productCount(member):
     message =  messagesTemplate["product-count"]['text']
     keyboard = keyboardTemplate['normal']
     sendMessage(member, message, keyboard)
+
+def orderDescription(member, cart):
+    print(cart)
+    message =  messagesTemplate["order-description"]['text'].format(
+        int(cart['count']) * int(cart['product']['amount']),
+        cart['product']['title'],
+        cart['product']['office'])
+
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def orderFile(member, cart):
+    message =  messagesTemplate["order-file"]['text']
+
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def orderFileAgain(member, cart):
+    message =  messagesTemplate["order-file-again"]['text']
+
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def cartAccept(member, cart):
+    message =  messagesTemplate["cart-acceptable"]['text'].format(len(cart))
+
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def cartAddress(member):
+    message =  messagesTemplate["cart-address"]['text']
+
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def cartAcceptAsk(member, cart):
+    message =  messagesTemplate["cart-info-accept"]['text']
+
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def cartAcceptDone(member):
+    message =  messagesTemplate["cart-acception-done"]['text']
+
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+    

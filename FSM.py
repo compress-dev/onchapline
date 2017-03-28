@@ -10,7 +10,7 @@ import random
 #   =========================================================================================
 import Telegram
 import ServerAPI
-
+import shop
 collections = {}
 debug = False
 roundCount = 3
@@ -18,6 +18,8 @@ commandTemplate = {}
 
 def init(clc):
     Telegram.init(clc)
+    shop.init(clc)
+
     global collections
     collections = clc
 
@@ -62,6 +64,10 @@ def mainMenu(member, message):
     elif message == "لیست سفارشات ارسال شده":
         return True
         pass
+    elif message == '/accept_cart':
+        setState(member, 'cart-address', {})
+        Telegram.cartAddress(member)
+
 #   =========================================================================================
 #                                      STATUS FUNCTIONS
 #   =========================================================================================
@@ -98,7 +104,7 @@ def state_reg1(member, message):
 #   ====================================  STATE  ready  ========================================
 def state_ready(member, message):
     return mainMenu(member, message)
-#   ====================================  STATE  reg1  ======================================
+#   ====================================  STATE  search product title  ======================================
 def state_search_product_title(member, message):
     if mainMenu(member, message):
         return True
@@ -113,7 +119,7 @@ def state_search_product_title(member, message):
     
     elif message.startswith('/take'):
 
-        setState(member, 'take-product', 
+        setState(member, 'order-count', 
             {
                 'productId': message.split("_")[1], 
                 'search' : member['state_extra']['search'],
@@ -124,12 +130,15 @@ def state_search_product_title(member, message):
     else:
         
         products = ServerAPI.searchProductsByTitle(message)
+
         for product in products:
             Telegram.product(member, product)
+
         Telegram.moreProducts(member)
         collections['members'].update({'_id': member['_id']}, {"$set" : {'state_extra' : {'search': message, 'offset': 5}}})
-#   ====================================  STATE  ready  ========================================
-def state_take_product(member, message):
+
+#   ====================================  STATE  order count  ========================================
+def state_order_count(member, message):
     if mainMenu(member, message):
         return True
     if message == '/cancel':
@@ -138,15 +147,106 @@ def state_take_product(member, message):
                 'search' : member['state_extra']['search'],
                 'offset' : member['state_extra']['offset']
             })
-    elif isdigit(message):
-        product = getProductById(member['state_extra']['id'])
-        setState(member, 'search-product-title', 
+    elif message.isdigit():
+        product = ServerAPI.getProductById(member['state_extra']['productId'])
+        cart = {
+                    'product' : product,
+                    'count': int(message),
+                    'files': [],
+                    'description': 'null'
+                }
+        print(product)
+        Telegram.orderDescription(member, cart)
+        setState(member, 'order-description', 
             {
                 'search' : member['state_extra']['search'],
                 'offset' : member['state_extra']['offset'],
-                'cart' : {
-                    'product' : product,
-                    'count': count,
-                    'files': []
-                }
+                'cart'   : cart
             })
+#   ====================================  STATE  order description  ========================================
+def state_order_description(member, message):
+    if mainMenu(member, message):
+        return True
+    if message == '/cancel':
+        setState(member, 'search-product-title', 
+            {
+                'search' : member['state_extra']['search'],
+                'offset' : member['state_extra']['offset']
+            })
+    else:
+        cart = member['state_extra']['cart']
+        cart['description'] = message
+        setState(member, 'order-file', 
+            {
+                'search' : member['state_extra']['search'],
+                'offset' : member['state_extra']['offset'],
+                'cart'   : cart
+            })
+        Telegram.orderFile(member, cart)
+#   ====================================  STATE  order file  ========================================
+def state_order_file(member, message):
+    if mainMenu(member, message):
+        return True
+    if message == '/cancel':
+        
+        setState(member, 'search-product-title', 
+            {
+                'search' : member['state_extra']['search'],
+                'offset' : member['state_extra']['offset']
+            })
+    elif message == '/upload_finish':
+        
+        setState(member, 'ready', 
+            {})
+        collections['members'].update({'_id': member['_id']}, {"$push" : {'cart' : member['state_extra']['cart']}})
+        member['cart'].append(member['state_extra']['cart'])
+        Telegram.cartAccept(member, member['cart'])
+    else:
+        cart = member['state_extra']['cart']
+        if 'document' in message:
+            cart['files'].append({'type': 'document', 'file': message['document']})
+        if 'audio' in message:
+            cart['files'].append({'type': 'audio', 'file': message['audio']})
+        if 'photo' in message:
+            cart['files'].append({'type': 'photo', 'file': message['photo']})
+        if 'video' in message:
+            cart['files'].append({'type': 'video', 'file': message['video']})
+        if 'voice' in message:
+            cart['files'].append({'type': 'voice', 'file': message['voice']})
+        if 'contact' in message:
+            cart['files'].append({'type': 'contact', 'file': message['contact']})
+
+        setState(member, 'order-file', 
+            {
+                'search' : member['state_extra']['search'],
+                'offset' : member['state_extra']['offset'],
+                'cart'   : cart
+            })
+        Telegram.orderFileAgain(member, cart)
+#   ====================================  STATE  cart address message  ========================================
+def state_cart_address_text(member, message):
+    if mainMenu(member, message):
+        return True
+    if message == '/cancel':
+        setState(member, 'ready', 
+            {})
+    else:
+        cart = member['cart']
+        #cart['address'] = 
+        setState(member, 'cart-accept-ask', 
+            {
+                'address' : message,
+            })
+        Telegram.cartAcceptAsk(member, cart)
+#   ====================================  STATE  cart confirm acception  ========================================
+def state_cart_accept(member, message):
+    if mainMenu(member, message):
+        return True
+    if message == '/cancel' or message == "/no":
+        setState(member, 'ready', 
+            {})
+    elif message == "/yes":
+        shop.acceptCart(member)
+        setState(member, 'ready',
+            {})
+        Telegram.cartAcceptDone(member)

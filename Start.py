@@ -25,23 +25,33 @@ debug = False
 FSM.init(collections)
 
 def FSMInput(member, message):
-    print(member)
-    if member['state'] == 'null':
-        FSM.stateNull(member, message)
-    elif member['state'] == 'reg0':
-        FSM.state_reg0(member, message)
-    elif member['state'] == 'reg1':
-        FSM.state_reg1(member, message)
-    elif member['state'] == 'ready':
-        FSM.state_ready(member, message)
-    elif member['state'] == 'search-product-title':
-        FSM.state_search_product_title(member, message)
-    elif member['state'] == 'take-product':
-        FSM.state_take_product(member, message)
-    elif member['state'] == 'ready':
-        FSM.state_ready(member, message)
-    elif member['state'] == 'ready':
-        FSM.state_ready(member, message)
+    if isinstance(message, str):
+        if member['state'] == 'null':
+            FSM.stateNull(member, message)
+        elif member['state'] == 'reg0':
+            FSM.state_reg0(member, message)
+        elif member['state'] == 'reg1':
+            FSM.state_reg1(member, message)
+        elif member['state'] == 'ready':
+            FSM.state_ready(member, message)
+        elif member['state'] == 'search-product-title':
+            FSM.state_search_product_title(member, message)
+        elif member['state'] == 'order-count':
+            FSM.state_order_count(member, message)
+        elif member['state'] == 'order-description':
+            FSM.state_order_description(member, message)
+        elif member['state'] == 'order-file':
+            FSM.state_order_file(member, message)
+        elif member['state'] == 'cart-address':
+            FSM.state_cart_address_text(member, message)
+        elif member['state'] == 'cart-accept-ask':
+            FSM.state_cart_accept(member, message)
+            
+    else:
+        if member['state'] == 'order-file':
+            FSM.state_order_file(member, message)
+        elif member['state'] == 'cart-address':
+            FSM.state_cart_address_point(member, message)
     return True
 #   =========================================================================================
 #                                         DEBUG RUNNING
@@ -59,22 +69,37 @@ if __name__ == '__main__':
         for message in messageList:
             if int(message['update_id']) > offset:
                 offset = int(message['update_id'])
-
             if 'message' in message:
-                memberId = message['message']['chat']['id']
-                messageText = message['message']['text']
-                member = {
-                    '_id'  : memberId,
-                    'name' : 'null',
-                    'state': 'null',
-                    'state_extra': {}
-                }
-                for m in collections['members'].find({"_id" : memberId}):
-                    member = m
-                
-                print("{1}> {0}".format(messageText, member['name']))
-                FSMResult = FSMInput(member, messageText)
 
+                if 'text' in message['message']:
+                    memberId = message['message']['chat']['id']
+                    messageText = message['message']['text']
+                    member = {
+                        '_id'  : memberId,
+                        'name' : 'null',
+                        'state': 'null',
+                        'state_extra': {}
+                    }
+                    for m in collections['members'].find({"_id" : memberId}):
+                        member = m
+                    
+                    print("{1}> {0}".format(messageText, member['name']))
+                    FSMResult = FSMInput(member, messageText)
+
+                if ('document' in message['message']) or ('audio' in message['message']) or ('photo' in message['message']) or ('video' in message['message']) or ('voice' in message['message']) or ('contact' in message['message']):
+                    memberId = message['message']['chat']['id']
+                    messageObject = message['message']
+                    member = {
+                        '_id'  : memberId,
+                        'name' : 'null',
+                        'state': 'null',
+                        'state_extra': {}
+                    }
+                    for m in collections['members'].find({"_id" : memberId}):
+                        member = m
+                    
+                    print("{1}> {0}".format('[file]', member['name']))
+                    FSMResult = FSMInput(member, messageObject)
         sleep(1)
 
     
