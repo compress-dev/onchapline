@@ -2,7 +2,7 @@ from pymongo import MongoClient
 import time
 import requests
 import json
-
+import urllib
 #   =========================================================================================
 #                                       CONFIGURATIONS
 #   =========================================================================================
@@ -35,17 +35,24 @@ def sendMessage(member , message = 'test(keyboard removed)', keyboard = {"remove
         print("{0}:\n{1}\n-----------------------------".format(member['name'], message))
         return True
     else:
-        url = 'https://api.telegram.org/bot373573330:AAG6GE-HiDo10VZe7JpMND666Jpdj-ZBp3g/sendMessage?chat_id=' + str(memberId) + '&text=' + message
+        inputs = {
+            'chat_id' : str(memberId),
+            'parse_mode': 'HTML',
+            'text' : message
+        }
+        url = 'https://api.telegram.org/bot373573330:AAG6GE-HiDo10VZe7JpMND666Jpdj-ZBp3g/sendMessage?'
         
         #{"keyboard":[[{"text": "yes 1"},{"text":"no"}]]}
         keyboard = json.dumps(keyboard)
-        url += '&reply_markup=' + keyboard
+        inputs['reply_markup'] = keyboard
 
         allowedMessages = json.dumps(["message", "inline_query", "chosen_inline_result", "callback_query"])
-        url += '&allowed_updates=' + allowedMessages
+        inputs['allowed_updates'] = allowedMessages
 
+        url += urllib.parse.urlencode(inputs)
         response = requests.get(url)
         content = response.content.decode("utf-8")
+        print(content)
         jsonResult = json.loads(content)
         return jsonResult['ok']
 
@@ -122,7 +129,15 @@ def searchAdvancedScoreAccept(member):
     sendMessage(member, message, keyboard)
 
 def product(member, product):
-    message =  messagesTemplate["product-message"]['text'].format(product['id'], product['title'], product['score'], product['price'], product['amount'], product['image'])
+    message =  messagesTemplate["product-message"]['text'].format(
+        product['image']
+        , product['title']
+        , product['office']
+        , product['amount']
+        , product['price']
+        , product['deposit']
+        , product['score']
+        , product['id'])
     keyboard = keyboardTemplate['normal']
     sendMessage(member, message, keyboard)
 

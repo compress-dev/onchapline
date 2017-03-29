@@ -14,8 +14,8 @@
   "search-product":{
     "text": "please enter product title"
   },
-  "product-message":{
-    "text": "product id {0} \ntitle: {1}\nscore: {2}\nprice: {3}\namount: {4}\nimage: {5}\nadd to cart /take_{0}"
+  "product-message": {
+    "text": "<a href=\"{0}\">{1}</a> از {2}\nتیراژ: {3}تایی\nهزینه: {4}تومان({5} تومان بیعانه)\nامتیاز: {6}\nانتخاب محصول: /take_{7}"
   },
   "product-count":{
     "text": "give us the amount or /cancel"
