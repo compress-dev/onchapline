@@ -1,68 +1,80 @@
 {
   "name-require": {
-    "text": "please enter your name"
+    "text": "سلام کاربر عزیز!\nبه آنچاپلاین خوش آمدید. لطفا نام و نام خانوادگی خود را به زبان فارسی وارد کنید."
   },
   "phone-require": {
-    "text": "ok {0} please enter your phone number"
+    "text": "{0} عزیز\nلطفا شماره تماس خود را وارد کنید"
   },
   "registered": {
-    "text": "you registered. your name is {0}\nyour phone is {1}"
+    "text": "تبریک می گویم {0} گرامی\nشما در آنچاپلاین ثبت نام کردید. شماره تماس شما {1} که در مواقع ضروری از آن استفاده خواهد شد.\nبرای جستجو میان سفارشات یا بررسی سفارشات ارسال شده خود می‌توانید از زیر استفاده کنید."
   },
-  "help":{
-    "text": "/informations \n/advanced_search \n/about \n/all_orders \n/running_orders"
+  "help": {
+    "text": "لیست قابلیت‌های دیگر آنچاپلاین\nجستجوی پیشرفته محصولات /advanced_search\nبا جستجوی پیشرفته می‌توانید محصولات را براساس قیمت، امتیاز و عنوان‌اشان مشاهده کنید\nسفارشات در حال اجرا /running_orders\nمی توانید سفارشاتی که هنوز تکمیل نشده و در مرحله اجرا هستند را از طریق این دستور پیگیری کنید.\nتمام سفارشات /all_orders\nمی تواند تمام سفارشات خود را درگذشته و حال از طریق این دستور بررسی کنید\n------------------\nسرویس آنچاپلاین یک سامانه برای سفارشگیری اینترنتی و پیگیری هرچه بهتر آنها توسط مشتریان است. هدف از این پروژه بی‌نیاز کردن مشتریان از حضور فیزیکی در دفاتر چاپ و مراکز تکثیر و انتشار است.\nمراکز چاپ و تکثیر می توانند با ثبت نام در این سامانه و عرضه محصولات خود، اقدام به ارائه خدمات در بستر اینترنت به مشتریان کنند. برای اطلاعات بیشتر با\nشماره +989216720496 یا @mr_exception تماس حاصل فرمایید."
   },
-  "search-product":{
-    "text": "please enter product title"
+  "search-product": {
+    "text": "لطفا عنوان محصولی که می خواهید یا بخشی از آن را وارد نمایید"
   },
   "product-message": {
-    "text": "<a href=\"{0}\">{1}</a> از {2}\nتیراژ: {3}تایی\nهزینه: {4}تومان({5} تومان بیعانه)\nامتیاز: {6}\nانتخاب محصول: /take_{7}"
+    "text": "<a href=\"{0}\">{1}</a> از {2}\nتیراژ: {3}تایی\nهزینه: {4}تومان({5} تومان بیعانه)\nامتیاز: {6}"
   },
-  "product-count":{
-    "text": "give us the amount or /cancel"
+  "product-count": {
+    "text": "تعداد موردنیاز برای این محصول را وارد نمایید. دقت کنید که تیراژ محصول {0} است. پس برای مثال با وارد کردن عدد 2 شما {1} عدد از این محصول را سفارش خواهید داد."
   },
-  "more-products":{
-    "text": "for more products type /more"
+  "more-products": {
+    "text": "برای مشاهده محصولات بیشتر از /more استفاده کنید."
   },
-  "order-description":{
-    "text": "you are ordering {0} of {1} to {2}.any description about this order?\notherwise type /cancel"
+  "order-description": {
+    "text": "شما تعداد {0} از {1} را به {2} سفارش داده اید. اگر توضیحی برای این سفارش دارد لطفا بنویسید.\nدر صورتی که از ارسال از سفارش منصرف شدید از /cancel استفاده کنید."
   },
-  "order-file":{
-    "text": "okay! now upload your files after finished file upload type /upload_finish or if you wannted to quit just type /cancel"
+  "order-file": {
+    "text": "لطفا فایل های ضمیمه (در صورت نیاز) برای این سفارش را ارسال نمایید.\nدر صورتی که از ارسال"
   },
-  "order-file-again":{
-    "text": "if your uploads are finished use /upload_finish. otherwise use /cancel to cancel progress or continue uploading"
+  "order-file-again": {
+    "text": "با موفقیت بارگزاری شد :)"
   },
-  "cart-acceptable":{
-    "text": "you have {0} orders in your cart. if you want to accept it use /accept_cart"
+  "cart-acceptable": {
+    "text": "شما {0} سفارش در سبد خرید خود دارید."
   },
-  "cart-address":{
-    "text": "please enter your address or use GPS to give us otherwise use /cancel"
+  "cart-address": {
+    "text": "لطفا آدرس خود را وارد کنید یا از GPS گوشی خود برای ارسال نقطه دقیق خود را برای ما ارسال کنید. سفارشات شما پس از آماده سازی به محلی که مقرر کرده اید با پیک ارسال خواهند شد!"
   },
-  "cart-info-accept":{
-    "text": "cart informations ... \ndo you accept it? /yes /no"
+  "cart-info-order": {
+    "text": "نام محصول: {0}\nچاپخانه: {1}\nهزینه کل: {2}\nبیعانه: {3}\nنمایش فایل های ضمیمه شده: /files_{4}\nحذف سفارش از سبد: /remove_{4}"
   },
-  "cart-acception-done":{
-    "text": "your cart sent, we'll notify you:)"
+  "cart-info-accept": {
+    "text": "آیا قصد ارسال سفارشات را دارید؟"
   },
-  "search-office":{
-    "text": "please enter print office title"
+  "cart-acception-done": {
+    "text": "سبد خرید شما ارسال شد. در اسرع وقت با بررسی سفارشات شما توسط چاپخانه‌های مقصد نسبت به اجرای آنها به شما اطلاع رسانی خواهیم کرد. شما می توانید با مراجعه به لیست سفارشات درحال اجرا و مشاهده سفارشات، به چاپخانه ها پیام ارسال کنید. ممکن است آنها نیز بخواهند پیامی به شما ارسال کنند :)\nهزینه بیعانه و سایر هزینه ها(به صلاح‌دید چاپخانه، پس از تایید سفارشات از همین جا قابل پرداخت است)\nبا تشکر از حسن انتخاب شما!"
   },
-  "search-advanced-score-min":{
-    "text": "please enter minimum score"
+  "search-office": {
+    "text": "لطفا عنوان چاپخانه مورد نظر را وارد کنید"
   },
-  "search-advanced-score-max":{
-    "text": "please enter maximum score"
+  "search-advanced-score-min": {
+    "text": "لطقا حداقل امتیاز مورد نظر را وارد کنید"
   },
-  "search-advanced-price-min":{
-    "text": "please enter minimum price"
+  "search-advanced-score-max": {
+    "text": "pلطفا حداکثر امتیاز مورد نظر را وارد کنید"
   },
-  "search-advanced-price-max":{
-    "text": "please enter maximum price"
+  "search-advanced-price-min": {
+    "text": "لطفا حداقل هزینه مورد نظر را وارد کنید"
   },
-  "search-advanced-price-accept":{
-    "text": "do you wanna search by price?"
+  "search-advanced-price-max": {
+    "text": "لطفا حداکثر هزینه مورد نظر را وارد کنید"
   },
-  "search-advanced-score-accept":{
-    "text": "do you wanna search by score?"
+  "search-advanced-price-accept": {
+    "text": "آیا قصد فیلتر کردن قیمت محصولات را نیز دارید؟"
+  },
+  "search-advanced-score-accept": {
+    "text": "آیا قصد فیلتر کردن امتیاز محصولات را نیز دارید؟"
+  },
+  "cart-order": {
+    "text": "{0} از {1}\nتعداد: {2}\nهزینه: {3} تومان({4} تومان به عنوان بیعانه پرداخت خواهد شد)"
+  },
+  "cart-order-print": {
+    "text": "{0}\nتعداد: {1}\nهزینه: {2}\nنام و نام خانوادگی: {3}\nآدرس: {4}\nتوضیحات: {4}\nفایل های ضمیمه:"
+  },
+  "order-remove": {
+    "text": "سفارش مورد نظر حذف شد. حال {0} در سبد خرید خود دارید."
   }
 }

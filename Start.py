@@ -100,6 +100,21 @@ if __name__ == '__main__':
                     
                     print("{1}> {0}".format('[file]', member['name']))
                     FSMResult = FSMInput(member, messageObject)
+            elif 'callback_query' in message:
+                memberId = message['callback_query']['from']['id']
+                messageText = message['callback_query']['data']
+
+                member = {
+                        '_id'  : memberId,
+                        'name' : 'null',
+                        'state': 'null',
+                        'state_extra': {}
+                    }
+                for m in collections['members'].find({"_id" : memberId}):
+                    member = m
+
+                print("{1}> {0}".format(messageText, member['name']))
+                FSMResult = FSMInput(member, messageText)
         sleep(1)
 
     

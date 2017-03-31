@@ -52,7 +52,7 @@ def sendMessage(member , message = 'test(keyboard removed)', keyboard = {"remove
         url += urllib.parse.urlencode(inputs)
         response = requests.get(url)
         content = response.content.decode("utf-8")
-        print(content)
+        
         jsonResult = json.loads(content)
         return jsonResult['ok']
 
@@ -138,7 +138,8 @@ def product(member, product):
         , product['deposit']
         , product['score']
         , product['id'])
-    keyboard = keyboardTemplate['normal']
+    keyboard = {'inline_keyboard':[[{"text":"انتخاب","callback_data":"/take_{0}".format(product['id'])}]]}
+
     sendMessage(member, message, keyboard)
 
 def moreProducts(member):
@@ -146,37 +147,61 @@ def moreProducts(member):
     keyboard = keyboardTemplate['normal']
     sendMessage(member, message, keyboard)
 
-def productCount(member):
-    message =  messagesTemplate["product-count"]['text']
-    keyboard = keyboardTemplate['normal']
+def productCount(member, product):
+    message =  messagesTemplate["product-count"]['text'].format(product['amount'], int(product['amount'])*2)
+    
+    keyboard = {'inline_keyboard':[
+        [
+        {"text":"از این سفارش منصرف شدم","callback_data":"/cancel"}]
+        ]}
+
     sendMessage(member, message, keyboard)
 
 def orderDescription(member, cart):
-    print(cart)
     message =  messagesTemplate["order-description"]['text'].format(
         int(cart['count']) * int(cart['product']['amount']),
         cart['product']['title'],
         cart['product']['office'])
 
-    keyboard = keyboardTemplate['normal']
+    keyboard = {'inline_keyboard':[
+        [
+        {"text":"توضیحی ندارم","callback_data":"none"},
+        {"text":"از سفارش منصرف شدم","callback_data":"/cancel"}
+        ]
+        ]}
     sendMessage(member, message, keyboard)
 
 def orderFile(member, cart):
     message =  messagesTemplate["order-file"]['text']
 
-    keyboard = keyboardTemplate['normal']
+    keyboard = {'inline_keyboard':[
+        [
+        {"text":"فایل برای آپلود ندارم","callback_data":"/upload_finish"},
+        {"text":"از سفارش منصرف شدم","callback_data":"/cancel"}
+        ]
+        ]}
     sendMessage(member, message, keyboard)
 
 def orderFileAgain(member, cart):
     message =  messagesTemplate["order-file-again"]['text']
 
-    keyboard = keyboardTemplate['normal']
+    keyboard = {'inline_keyboard':[
+        [
+        {"text":"تمام شدند","callback_data":"/upload_finish"},
+        {"text":"از سفارش منصرف شدم","callback_data":"/cancel"}
+        ]
+        ]}
     sendMessage(member, message, keyboard)
 
 def cartAccept(member, cart):
     message =  messagesTemplate["cart-acceptable"]['text'].format(len(cart))
 
-    keyboard = keyboardTemplate['normal']
+    keyboard = {'inline_keyboard':[
+        [
+        {"text":"ارسال سبد خرید به چاپخانه ها","callback_data":"/accept_cart"},
+        {"text":"مشاهده سبد خرید","callback_data":"مشاهده سبد خرید"}
+        ]
+        ]}
     sendMessage(member, message, keyboard)
 
 def cartAddress(member):
@@ -188,7 +213,12 @@ def cartAddress(member):
 def cartAcceptAsk(member, cart):
     message =  messagesTemplate["cart-info-accept"]['text']
 
-    keyboard = keyboardTemplate['normal']
+    keyboard = {'inline_keyboard':[
+        [
+        {"text":"بلی","callback_data":"/yes"},
+        {"text":"خیر","callback_data":"/no"}
+        ]
+        ]}
     sendMessage(member, message, keyboard)
 
 def cartAcceptDone(member):
@@ -196,4 +226,38 @@ def cartAcceptDone(member):
 
     keyboard = keyboardTemplate['normal']
     sendMessage(member, message, keyboard)
-    
+
+def cartOrder(member, order, orderIndex):
+    message =  messagesTemplate["cart-order"]['text'].format(
+        order['product']['title'], 
+        order['product']['office'], 
+        int(order['product']['amount'])*int(order['count']),
+        int(order['product']['price'])*int(order['count']),
+        order['product']['deposit'])
+
+    keyboard = {'inline_keyboard':[[{"text":"حذف","callback_data":"/remove_{0}".format(orderIndex)}]]}
+    sendMessage(member, message, keyboard)
+
+def cartOrderRemoved(member):
+    message =  messagesTemplate["order-remove"]['text'].format(len(member['cart']))
+
+    keyboard = {'inline_keyboard':[[{"text":"ارسال سبد خرید به چاپخانه ها","callback_data":"/accept_cart"}]]}
+    sendMessage(member, message, keyboard)
+
+def orderForPrint(cart, orderIndex):
+    message =  messagesTemplate["cart-order-print"]['text'].format(
+        cart['orders'][orderIndex]['product']['title'], 
+        cart['orders'][orderIndex]['product']['office'], 
+        int(cart['orders'][orderIndex]['product']['amount'])*int(cart['orders'][orderIndex]['count']),
+        int(cart['orders'][orderIndex]['product']['price'])* int(cart['orders'][orderIndex]['count']),
+        cart['address'],
+        cart['orders'][orderIndex]['description'])
+
+    keyboard = {'inline_keyboard':[[
+        {"text":"تایید سفارش","callback_data":"/accept_order_{0}_{1}".format(cart['_id'], orderIndex)},
+        {"text":"ارسال پیام","callback_data":"/message_order_{0}_{1}".format(cart['_id'], orderIndex)},
+        {"text":"رد سفارش","callback_data":"/refuse_order_{0}_{1}".format(cart['_id'], orderIndex)}
+        ]]}
+
+    member = { '_id': cart['orders'][orderIndex]['product']['chat_id']}
+    sendMessage(member, message, keyboard)

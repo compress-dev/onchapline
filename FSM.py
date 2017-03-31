@@ -39,6 +39,9 @@ def getState(member):
     return 'null'
 
 def mainMenu(member, message):
+    if not isinstance(message, str):
+        return False
+
     if message == "بیشتر":
         Telegram.help(member)
         return True
@@ -57,16 +60,34 @@ def mainMenu(member, message):
     elif message == "informations":
         Telegram.help(member)
         return True
+    
     elif message == "جستجوی چاپخانه ها":
         Telegram.searchByOffice(member)
         setState(member, 'search-office-title')
         return True
+    
     elif message == "لیست سفارشات ارسال شده":
         return True
-        pass
+    
     elif message == '/accept_cart':
         setState(member, 'cart-address', {})
         Telegram.cartAddress(member)
+        return True
+
+    elif message == 'مشاهده سبد خرید':
+        cart = member['cart']
+        for i in range(0, len(cart)):
+            Telegram.cartOrder(member, cart[i], i)
+
+        Telegram.cartAccept(member, member['cart'])
+        return True
+
+    elif message.startswith("/remove_"):
+        orderIndex = int(message.split("_")[1])
+        del member['cart'][orderIndex]
+        collections['members'].update({'_id': member['_id']},{ "$set": {'cart': member['cart']}})
+        Telegram.cartOrderRemoved(member)
+        return True
 
 #   =========================================================================================
 #                                      STATUS FUNCTIONS
@@ -108,25 +129,24 @@ def state_ready(member, message):
 def state_search_product_title(member, message):
     if mainMenu(member, message):
         return True
-    
     if message == '/more':
-        
+
         products = ServerAPI.searchProductsByTitle(member['state_extra']['search'])
         collections['members'].update({'_id': member['_id']}, {"$set" : {'state_extra' : {'search': member['state_extra']['search'] ,'offset': 5 + member['state_extra']['offset']}}})
         for product in products:
             Telegram.product(member, product)
         Telegram.moreProducts(member)
-    
-    elif message.startswith('/take'):
 
+    elif message.startswith('/take'):
+        product = ServerAPI.getProductById(message.split("_")[1])
         setState(member, 'order-count', 
             {
-                'productId': message.split("_")[1], 
+                'product': product,
                 'search' : member['state_extra']['search'],
                 'offset' : member['state_extra']['offset']
             })
-        Telegram.productCount(member)
-
+        Telegram.productCount(member,product)
+    
     else:
         
         products = ServerAPI.searchProductsByTitle(message)
@@ -148,14 +168,12 @@ def state_order_count(member, message):
                 'offset' : member['state_extra']['offset']
             })
     elif message.isdigit():
-        product = ServerAPI.getProductById(member['state_extra']['productId'])
         cart = {
-                    'product' : product,
+                    'product' : member['state_extra']['product'],
                     'count': int(message),
                     'files': [],
                     'description': 'null'
                 }
-        print(product)
         Telegram.orderDescription(member, cart)
         setState(member, 'order-description', 
             {
