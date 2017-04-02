@@ -25,6 +25,7 @@ def acceptCart(member):
 
     cart = {
         'address' : address,
+        'sender'  : member,
         'orders'  : member['cart'],
         'status'  : 'IN-PROGRESS'
     }

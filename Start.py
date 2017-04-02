@@ -46,12 +46,15 @@ def FSMInput(member, message):
             FSM.state_cart_address_text(member, message)
         elif member['state'] == 'cart-accept-ask':
             FSM.state_cart_accept(member, message)
-            
+        elif member['state'] == 'order-message':
+            FSM.state_message(member, message)
     else:
         if member['state'] == 'order-file':
             FSM.state_order_file(member, message)
         elif member['state'] == 'cart-address':
             FSM.state_cart_address_point(member, message)
+        elif member['state'] == 'order-message':
+            FSM.state_message(member, message, True)
     return True
 #   =========================================================================================
 #                                         DEBUG RUNNING

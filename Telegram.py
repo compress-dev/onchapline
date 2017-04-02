@@ -246,10 +246,10 @@ def cartOrderRemoved(member):
 
 def orderForPrint(cart, orderIndex):
     message =  messagesTemplate["cart-order-print"]['text'].format(
-        cart['orders'][orderIndex]['product']['title'], 
-        cart['orders'][orderIndex]['product']['office'], 
+        cart['orders'][orderIndex]['product']['title'],
         int(cart['orders'][orderIndex]['product']['amount'])*int(cart['orders'][orderIndex]['count']),
         int(cart['orders'][orderIndex]['product']['price'])* int(cart['orders'][orderIndex]['count']),
+        cart['orders'][orderIndex]['sender']['name'], 
         cart['address'],
         cart['orders'][orderIndex]['description'])
 
@@ -260,4 +260,96 @@ def orderForPrint(cart, orderIndex):
         ]]}
 
     member = { '_id': cart['orders'][orderIndex]['product']['chat_id']}
+    sendMessage(member, message, keyboard)
+    for f in cart['orders'][orderIndex]['files']:
+        sendFile(member, f['file'], f['type'])
+
+def sendFile(member, file, fileType):
+    caption = ''
+    if 'caption' in file:
+        caption = file['caption']
+
+    if fileType == 'document':
+        url = 'https://api.telegram.org/bot373573330:AAG6GE-HiDo10VZe7JpMND666Jpdj-ZBp3g/sendDocument?'
+        inputs = {
+            'chat_id' : str(member['_id']),
+            'document': file['document']['file_id'],
+            'caption' : caption
+        }
+    if fileType == 'audio':
+        url = 'https://api.telegram.org/bot373573330:AAG6GE-HiDo10VZe7JpMND666Jpdj-ZBp3g/sendAudio?'
+        inputs = {
+            'chat_id' : str(member['_id']),
+            'audio': file['audio']['file_id'],
+            'title': file['audio']['title'],
+            'caption' : caption
+        }
+    if fileType == 'photo':
+        url = 'https://api.telegram.org/bot373573330:AAG6GE-HiDo10VZe7JpMND666Jpdj-ZBp3g/sendPhoto?'
+        inputs = {
+            'chat_id' : str(member['_id']),
+            'photo': file['photo'][-1]['file_id'],
+            'caption' : caption
+        }
+    if fileType == 'video':
+        url = 'https://api.telegram.org/bot373573330:AAG6GE-HiDo10VZe7JpMND666Jpdj-ZBp3g/sendVideo?'
+        inputs = {
+            'chat_id' : str(member['_id']),
+            'video': file['video']['file_id'],
+            'caption' : caption
+        }
+    if fileType == 'voice':
+        url = 'https://api.telegram.org/bot373573330:AAG6GE-HiDo10VZe7JpMND666Jpdj-ZBp3g/sendVoice?'
+        inputs = {
+            'chat_id' : str(member['_id']),
+            'voice': file['voice']['file_id'],
+            'caption' : caption
+        }
+
+    url += urllib.parse.urlencode(inputs)
+    response = requests.get(url)
+
+def orderAcceptPrint(member):
+    message =  messagesTemplate["order-accept-print"]['text']
+
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def orderRefusePrint(member):
+    message =  messagesTemplate["order-refuse-print"]['text']
+
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)
+
+def orderAcceptMember(member, cart, orderIndex):
+    message =  messagesTemplate["order-accept-member"]['text'].format(
+        cart['orders'][orderIndex]['product']['title'], 
+        int(cart['orders'][orderIndex]['product']['amount']) * int(cart['orders'][orderIndex]['count']),
+        cart['orders'][orderIndex]['product']['office'])
+
+    dep = cart['orders'][orderIndex]['product']['deposit'] * cart['orders'][orderIndex]['count']
+    keyboard = {'inline_keyboard':[
+    [{"text":"پرداخت {0} تومان بیعانه".format(dep),"callback_data":"/pay_order_dep_{0}_{1}".format(cart['_id'], orderIndex)}],
+    [{"text":"از این سفارش انصراف می دهم".format(dep),"callback_data":"/cancel_order_{0}_{1}".format(cart['_id'], orderIndex)}]
+    ]}
+    sendMessage(member, message, keyboard)
+
+def orderRefuseMember(member, cart, orderIndex):
+    message =  messagesTemplate["order-refuse-member"]['text'].format(
+        cart['orders'][orderIndex]['product']['title'], 
+        int(cart['orders'][orderIndex]['product']['amount']) * int(cart['orders'][orderIndex]['count']),
+        cart['orders'][orderIndex]['product']['office'])
+
+    keyboard = keyboardTemplate['normal']
+    sendMessage(member, message, keyboard)   
+
+def orderTextMessage(member, message, cart, orderIndex):
+    message =  messagesTemplate["order-message-text"]['text'].format(
+        cart['orders'][orderIndex]['product']['title'],
+        cart['orders'][orderIndex]['product']['office'],
+        message)
+
+    keyboard = {'inline_keyboard':[
+    [{"text":"پاسخ دادن".format(dep),"callback_data":"/order_message_{0}_{1}".format(cart['_id'], orderIndex)}]
+    ]}
     sendMessage(member, message, keyboard)
