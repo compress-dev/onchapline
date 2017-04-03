@@ -54,8 +54,12 @@ def mainMenu(member, message):
         return True
         pass
     elif message == "لیست سفارشات در حال اجرا":
+        orders = []
+        for cart in collections['orders'].find({'orders.status':{'$not': {'$eq': 'DELIVERED'}}}):
+            for i in range(0, len(cart['orders'])):
+                if cart['orders'][i]['status'] != 'DELIVERED':
+                    Telegram.orderInfoMessage(member, cart, i)
         return True
-        pass
 
     # more commands
     elif message == "informations":
@@ -114,7 +118,7 @@ def mainMenu(member, message):
         receiver = 'null'
         if member['_id'] == cart['sender']['_id']:
             receiverId = cart['orders'][orderIndex]['product']['chat_id']
-            receiver = collections['members'].find_one({'_id': receiverId})
+            receiver = collections['members'].find_one({'_id': int(receiverId)})
         else:
             receiver = cart['sender']
         
@@ -124,7 +128,7 @@ def mainMenu(member, message):
                 'order-index': orderIndex,
                 'receiver': receiver
             })
-
+        Telegram.orderMessage(member)
     elif message.startswith('/refuse_order_'):
         parts = message.split("_")
         cartId = parts[2]
@@ -221,7 +225,8 @@ def state_order_count(member, message):
                     'product' : member['state_extra']['product'],
                     'count': int(message),
                     'files': [],
-                    'description': 'null'
+                    'description': 'null',
+                    'messages': []
                 }
         Telegram.orderDescription(member, cart)
         setState(member, 'order-description', 
@@ -318,29 +323,24 @@ def state_cart_accept(member, message):
             {})
         Telegram.cartAcceptDone(member)
 #   ====================================  STATE  cart confirm acception  ========================================
-def state_message(member, message, ifFile = False):
+def state_message(member, message, isFile = False):
     if mainMenu(member, message):
         return True
     if message == '/cancel':
         setState(member, 'ready', 
             {})
     else:
-        cart = member['state_extra']['cart']
         orderIndex = member['state_extra']['order-index']
-        if 'messages' not in cart['orders'][orderIndex]:
-            cart['orders'][orderIndex]['messages'] = []
-        
 
-        cart['orders'][orderIndex]['messages'].append({
-            'message': message,
-            'sender' : member,
-            'type'   : 'text'
-            })
-
-        collections['orders'].update({'_id': ObjectId(cart['_id'])},
-            {'$set' : {'orders': cart['orders']}})
-
+        collections['orders'].update({'_id': ObjectId(member['state_extra']['cart']['_id'])}, {'$push' : 
+            {'orders.{0}.messages'.format(orderIndex): 
+                {
+                    'message': message,
+                    'sender' : member,
+                    'type'   : 'text'
+                }
+            }})
         if isFile:
             pass
         else:  
-            Telegram.orderTextMessage(member['state_extra']['receiver'], message, cart, orderIndex)
+            Telegram.orderTextMessage(member['state_extra']['receiver'], message, member['state_extra']['cart'], orderIndex)

@@ -343,6 +343,10 @@ def orderRefuseMember(member, cart, orderIndex):
     keyboard = keyboardTemplate['normal']
     sendMessage(member, message, keyboard)   
 
+def orderMessage(member):
+    message = messagesTemplate['order-message']['text']
+    sendMessage(member, message)
+
 def orderTextMessage(member, message, cart, orderIndex):
     message =  messagesTemplate["order-message-text"]['text'].format(
         cart['orders'][orderIndex]['product']['title'],
@@ -350,6 +354,43 @@ def orderTextMessage(member, message, cart, orderIndex):
         message)
 
     keyboard = {'inline_keyboard':[
-    [{"text":"پاسخ دادن".format(dep),"callback_data":"/order_message_{0}_{1}".format(cart['_id'], orderIndex)}]
+    [{"text":"پاسخ دادن","callback_data":"/message_order_{0}_{1}".format(cart['_id'], orderIndex)}]
     ]}
     sendMessage(member, message, keyboard)
+
+def orderInfoMessage(member, cart, orderIndex):
+    message =  messagesTemplate["order-message-normal"]['text'].format(
+            cart['orders'][orderIndex]['product']['title'],
+            cart['orders'][orderIndex]['product']['office'],
+            int(cart['orders'][orderIndex]['product']['amount']) * int(cart['orders'][orderIndex]['count']),
+            int(cart['orders'][orderIndex]['product']['price']) * int(cart['orders'][orderIndex]['count']),
+            0,
+            cart['address'],
+            cart['orders'][orderIndex]['description']
+        )
+
+    keyboard = keyboardTemplate['normal']
+    print(message)
+    if member['_id'] == cart['sender']['_id']:
+        keyboard = {'inline_keyboard':[
+        [{"text":"لغو","callback_data":"/order_cancel_{0}_{1}".format(cart['_id'], orderIndex)},
+        {"text":"ارسال پیام","callback_data":"/order_message_{0}_{1}".format(cart['_id'], orderIndex)}]
+        ]}
+    else:
+        if cart['orders'][orderIndex]['status'] == 'IN-PROGRESS':
+            keyboard = {'inline_keyboard':[
+            [{"text":"لغو","callback_data":"/order_cancel_{0}_{1}".format(cart['_id'], orderIndex)},
+            {"text":"ارسال پیام","callback_data":"/order_message_{0}_{1}".format(cart['_id'], orderIndex)}]
+            ]}
+        elif cart['orders'][orderIndex]['status'] == 'FINISHED':
+            keyboard = {'inline_keyboard':[
+            [{"text":"ارسال پیام","callback_data":"/order_message_{0}_{1}".format(cart['_id'], orderIndex)}]
+            ]}
+        elif cart['orders'][orderIndex]['status'] == 'ACCEPTED':
+            keyboard = {'inline_keyboard':[
+            [{"text":"ارسال پیام","callback_data":"/order_message_{0}_{1}".format(cart['_id'], orderIndex)},
+            {"text":"سفارش آماده ارسال شد","callback_data":"/order_finished_{0}_{1}".format(cart['_id'], orderIndex)}]
+            ]}
+    sendMessage(member, message, keyboard)
+    for f in cart['orders'][orderIndex]['files']:
+        sendFile(member, f['file'], f['type'])
