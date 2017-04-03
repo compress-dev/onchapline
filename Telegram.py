@@ -249,7 +249,7 @@ def orderForPrint(cart, orderIndex):
         cart['orders'][orderIndex]['product']['title'],
         int(cart['orders'][orderIndex]['product']['amount'])*int(cart['orders'][orderIndex]['count']),
         int(cart['orders'][orderIndex]['product']['price'])* int(cart['orders'][orderIndex]['count']),
-        cart['orders'][orderIndex]['sender']['name'], 
+        cart['sender']['name'], 
         cart['address'],
         cart['orders'][orderIndex]['description'])
 
