@@ -26,7 +26,7 @@ FSM.init(collections)
 
 def FSMInput(member, message):
     if isinstance(message, str):
-        if member['state'] == 'null':
+        if member['state'] == 'null' or member['name'] == 'null':
             FSM.stateNull(member, message)
         elif member['state'] == 'reg0':
             FSM.state_reg0(member, message)
