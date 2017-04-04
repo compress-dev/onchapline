@@ -201,14 +201,17 @@ def state_search_product_title(member, message):
         Telegram.productCount(member,product)
     
     else:
-        
-        products = ServerAPI.searchProductsByTitle(message)
+        if isKeyword(message):
+            setState(member, 'ready', {})
+            state_ready(member, message)
+        else:
+            products = ServerAPI.searchProductsByTitle(message)
 
-        for product in products:
-            Telegram.product(member, product)
+            for product in products:
+                Telegram.product(member, product)
 
-        Telegram.moreProducts(member)
-        collections['members'].update({'_id': member['_id']}, {"$set" : {'state_extra' : {'search': message, 'offset': 5}}})
+            Telegram.moreProducts(member)
+            collections['members'].update({'_id': member['_id']}, {"$set" : {'state_extra' : {'search': message, 'offset': 5}}})
 
 #   ====================================  STATE  order count  ========================================
 def state_order_count(member, message):
@@ -235,6 +238,9 @@ def state_order_count(member, message):
                 'offset' : member['state_extra']['offset'],
                 'cart'   : cart
             })
+    else:
+        setState(member, 'ready', {})
+        state_ready(member, message)
 #   ====================================  STATE  order description  ========================================
 def state_order_description(member, message):
     if mainMenu(member, message):
@@ -246,15 +252,19 @@ def state_order_description(member, message):
                 'offset' : member['state_extra']['offset']
             })
     else:
-        cart = member['state_extra']['cart']
-        cart['description'] = message
-        setState(member, 'order-file', 
-            {
-                'search' : member['state_extra']['search'],
-                'offset' : member['state_extra']['offset'],
-                'cart'   : cart
-            })
-        Telegram.orderFile(member, cart)
+        if isKeyword(message):
+            setState(member, 'ready', {})
+            state_ready(member, message)
+        else:
+            cart = member['state_extra']['cart']
+            cart['description'] = message
+            setState(member, 'order-file', 
+                {
+                    'search' : member['state_extra']['search'],
+                    'offset' : member['state_extra']['offset'],
+                    'cart'   : cart
+                })
+            Telegram.orderFile(member, cart)
 #   ====================================  STATE  order file  ========================================
 def state_order_file(member, message):
     if mainMenu(member, message):
@@ -274,27 +284,31 @@ def state_order_file(member, message):
         member['cart'].append(member['state_extra']['cart'])
         Telegram.cartAccept(member, member['cart'])
     else:
-        cart = member['state_extra']['cart']
-        if 'document' in message:
-            cart['files'].append({'type': 'document', 'file': message})
-        if 'audio' in message:
-            cart['files'].append({'type': 'audio', 'file': message})
-        if 'photo' in message:
-            cart['files'].append({'type': 'photo', 'file': message})
-        if 'video' in message:
-            cart['files'].append({'type': 'video', 'file': message})
-        if 'voice' in message:
-            cart['files'].append({'type': 'voice', 'file': message})
-        if 'contact' in message:
-            cart['files'].append({'type': 'contact', 'file': message})
+        if isKeyword(message):
+            setState(member, 'ready', {})
+            state_ready(member, message)
+        else:
+            cart = member['state_extra']['cart']
+            if 'document' in message:
+                cart['files'].append({'type': 'document', 'file': message})
+            if 'audio' in message:
+                cart['files'].append({'type': 'audio', 'file': message})
+            if 'photo' in message:
+                cart['files'].append({'type': 'photo', 'file': message})
+            if 'video' in message:
+                cart['files'].append({'type': 'video', 'file': message})
+            if 'voice' in message:
+                cart['files'].append({'type': 'voice', 'file': message})
+            if 'contact' in message:
+                cart['files'].append({'type': 'contact', 'file': message})
 
-        setState(member, 'order-file', 
-            {
-                'search' : member['state_extra']['search'],
-                'offset' : member['state_extra']['offset'],
-                'cart'   : cart
-            })
-        Telegram.orderFileAgain(member, cart)
+            setState(member, 'order-file', 
+                {
+                    'search' : member['state_extra']['search'],
+                    'offset' : member['state_extra']['offset'],
+                    'cart'   : cart
+                })
+            Telegram.orderFileAgain(member, cart)
 #   ====================================  STATE  cart address message  ========================================
 def state_cart_address_text(member, message):
     if mainMenu(member, message):
@@ -303,13 +317,17 @@ def state_cart_address_text(member, message):
         setState(member, 'ready', 
             {})
     else:
-        cart = member['cart']
-        #cart['address'] = 
-        setState(member, 'cart-accept-ask', 
-            {
-                'address' : message,
-            })
-        Telegram.cartAcceptAsk(member, cart)
+        if isKeyword(message):
+            setState(member, 'ready', {})
+            state_ready(member, message)
+        else:
+            cart = member['cart']
+            #cart['address'] = 
+            setState(member, 'cart-accept-ask', 
+                {
+                    'address' : message,
+                })
+            Telegram.cartAcceptAsk(member, cart)
 #   ====================================  STATE  cart confirm acception  ========================================
 def state_cart_accept(member, message):
     if mainMenu(member, message):
@@ -322,6 +340,9 @@ def state_cart_accept(member, message):
         setState(member, 'ready',
             {})
         Telegram.cartAcceptDone(member)
+    else:
+        setState(member, 'ready', {})
+        state_ready(member, message)
 #   ====================================  STATE  cart confirm acception  ========================================
 def state_message(member, message, isFile = False):
     if mainMenu(member, message):
@@ -343,4 +364,51 @@ def state_message(member, message, isFile = False):
         if isFile:
             pass
         else:  
-            Telegram.orderTextMessage(member['state_extra']['receiver'], message, member['state_extra']['cart'], orderIndex)
+            if isKeyword(message):
+                setState(member, 'ready', {})
+                state_ready(member, message)
+            else:
+                Telegram.orderTextMessage(member['state_extra']['receiver'], message, member['state_extra']['cart'], orderIndex)
+
+# ========================================= RESERVED KEYWORDS ===============================================
+def isKeyword(message):
+    if message == 'بیشتر':
+        return 1
+    elif message == 'جستجوی محصولات':
+        return 2
+    elif message == 'جستجوی پیشرفته محصولات':
+        return 3
+    elif message == 'لیست سفارشات در حال اجرا':
+        return 4
+    elif message == 'مشاهده سبد خرید':
+        return 5
+    elif message == 'بسه!':
+        return 6
+    elif message == 'بیشتر بیار':
+        return 7
+    elif message == '/cancel':
+        return 8
+    elif message == '/accept_cart':
+        return 9
+    elif message == '/start':
+        return 10
+    elif message == '/more':
+        return 11
+    elif message.startswith('/remove_'):
+        return 12
+    elif message.startswith('/take_'):
+        return 13
+    elif message.startswith('/accept_order_'):
+        return 14
+    elif message.startswith('/message_order_'):
+        return 15
+    elif message.startswith('/refuse_order_'):
+        return 16
+    elif message == '/upload_finish':
+        return 17
+    elif message == '/yes':
+        return 18
+    elif message == '/no':
+        return 19
+    else:
+        return 0
