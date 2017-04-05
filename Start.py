@@ -90,7 +90,7 @@ if __name__ == '__main__':
                     print("{1}> {0}".format(messageText, member['name']))
                     FSMResult = FSMInput(member, messageText)
 
-                if ('document' in message['message']) or ('audio' in message['message']) or ('photo' in message['message']) or ('video' in message['message']) or ('voice' in message['message']) or ('contact' in message['message']):
+                if ('document' in message['message']) or ('audio' in message['message']) or ('photo' in message['message']) or ('video' in message['message']) or ('voice' in message['message']) or ('contact' in message['message']) or ('location' in message['message']):
                     memberId = message['message']['chat']['id']
                     messageObject = message['message']
                     member = {

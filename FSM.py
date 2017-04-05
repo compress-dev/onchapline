@@ -195,7 +195,7 @@ def state_search_product_title(member, message):
             Telegram.product(member, product)
         Telegram.moreProducts(member)
 
-    elif message.startswith('/take'):
+    elif message.startswith('/take_'):
         product = ServerAPI.getProductById(message.split("_")[1])
         setState(member, 'order-count', 
             {
@@ -337,7 +337,7 @@ def state_cart_address_text(member, message):
                     },
                 })
             Telegram.cartAcceptAsk(member, cart)
-def state_cart_address_pos(member, message):
+def state_cart_address_point(member, message):
     if mainMenu(member, message):
         return True
     if message == '/cancel':

@@ -251,7 +251,7 @@ def orderForPrint(cart, orderIndex):
         int(cart['orders'][orderIndex]['product']['price'])* int(cart['orders'][orderIndex]['count']),
         cart['sender']['name'], 
         getAddress(cart['address']),
-        getAddress(cart['orders'][orderIndex]['description']))
+        getDescription(cart['orders'][orderIndex]['description']))
 
     keyboard = {'inline_keyboard':[[
         {"text":"تایید سفارش","callback_data":"/accept_order_{0}_{1}".format(cart['_id'], orderIndex)},
@@ -405,6 +405,7 @@ def orderInfoMessage(member, cart, orderIndex):
         sendFile(member, f['file'], f['type'], messageId)
 
 def getAddress(address):
+    print(address)
     if address['text'] == 'none':
         return ''
     else:
@@ -426,6 +427,7 @@ def sendLocation(location, messageId, memberId):
     }
     url = 'https://api.telegram.org/bot373573330:AAG6GE-HiDo10VZe7JpMND666Jpdj-ZBp3g/sendLocation?'
     
+    keyboard = keyboardTemplate['normal']
     #{"keyboard":[[{"text": "yes 1"},{"text":"no"}]]}
     keyboard = json.dumps(keyboard)
     inputs['reply_markup'] = keyboard
