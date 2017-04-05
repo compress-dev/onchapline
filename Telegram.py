@@ -16,9 +16,10 @@ def init(clc):
     collections = clc
 
     global messagesTemplate
-    messagesTemplate = json.loads(open("messages-template.json", 'r', encoding="utf-8").read())
+    messagesTemplate = json.loads(open("templates/messages-template.json", 'r', encoding="utf-8").read())
+    
     global keyboardTemplate
-    keyboardTemplate = json.loads(open("keyboard-template.json", 'r', encoding="utf-8").read())
+    keyboardTemplate = json.loads(open("templates/keyboard-template.json", 'r', encoding="utf-8").read())
 
 #   =========================================================================================
 #                                    BASE-LAYERED FUNCTION

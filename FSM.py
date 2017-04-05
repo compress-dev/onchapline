@@ -25,7 +25,7 @@ def init(clc):
     collections = clc
 
     global commandTemplate
-    commandTemplate = json.loads(open("command-template.json", 'r', encoding="utf-8").read())
+    commandTemplate = json.loads(open("templates/command-template.json", 'r', encoding="utf-8").read())
 
 
 #   =========================================================================================
