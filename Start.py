@@ -8,11 +8,12 @@ import urllib
 #                                       CONFIGURATIONS
 #   =========================================================================================
 import FSM;
+import values;
 from values import *;
 
 
 print("connecting to mongodb")
-client = MongoClient('mongodb://127.0.0.1')
+client = MongoClient('mongodb://{0}:{1}@127.0.0.1'.format(username, password))
 print("connected  to mongodb")
 
 database = client.onchapline
