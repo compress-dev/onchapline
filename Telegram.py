@@ -54,7 +54,7 @@ def sendMessage(member , message = 'test(keyboard removed)', keyboard = {"remove
         content = response.content.decode("utf-8")
         
         jsonResult = json.loads(content)
-        return jsonResult['ok']
+        return jsonResult['result']['message_id']
 
 def getMessageString(messageId):
     for message in collections['messages'].find({'_id': messageId}):
@@ -250,8 +250,8 @@ def orderForPrint(cart, orderIndex):
         int(cart['orders'][orderIndex]['product']['amount'])*int(cart['orders'][orderIndex]['count']),
         int(cart['orders'][orderIndex]['product']['price'])* int(cart['orders'][orderIndex]['count']),
         cart['sender']['name'], 
-        cart['address'],
-        cart['orders'][orderIndex]['description'])
+        getAddress(cart['address']),
+        getAddress(cart['orders'][orderIndex]['description']))
 
     keyboard = {'inline_keyboard':[[
         {"text":"تایید سفارش","callback_data":"/accept_order_{0}_{1}".format(cart['_id'], orderIndex)},
@@ -260,11 +260,14 @@ def orderForPrint(cart, orderIndex):
         ]]}
 
     member = { '_id': cart['orders'][orderIndex]['product']['chat_id']}
-    sendMessage(member, message, keyboard)
-    for f in cart['orders'][orderIndex]['files']:
-        sendFile(member, f['file'], f['type'])
+    messageId = sendMessage(member, message, keyboard)
 
-def sendFile(member, file, fileType):
+    sendLocation(cart['address'], messageId, member['_id'])
+
+    for f in cart['orders'][orderIndex]['files']:
+        sendFile(member, f['file'], f['type'], messageId)
+
+def sendFile(member, file, fileType, messageId):
     caption = ''
     if 'caption' in file:
         caption = file['caption']
@@ -306,6 +309,7 @@ def sendFile(member, file, fileType):
             'caption' : caption
         }
 
+    inputs['reply_to_message_id'] = messageId
     url += urllib.parse.urlencode(inputs)
     response = requests.get(url)
 
@@ -365,13 +369,14 @@ def orderInfoMessage(member, cart, orderIndex):
             int(cart['orders'][orderIndex]['product']['amount']) * int(cart['orders'][orderIndex]['count']),
             int(cart['orders'][orderIndex]['product']['price']) * int(cart['orders'][orderIndex]['count']),
             0,
-            cart['address'],
-            cart['orders'][orderIndex]['description']
+            getAddress(cart['address']),
+            getDescription(cart['orders'][orderIndex]['description'])
         )
 
     keyboard = keyboardTemplate['normal']
-    print(message)
+
     if member['_id'] == cart['sender']['_id']:
+
         keyboard = {'inline_keyboard':[
         [{"text":"لغو","callback_data":"/order_cancel_{0}_{1}".format(cart['_id'], orderIndex)},
         {"text":"ارسال پیام","callback_data":"/order_message_{0}_{1}".format(cart['_id'], orderIndex)}]
@@ -391,6 +396,42 @@ def orderInfoMessage(member, cart, orderIndex):
             [{"text":"ارسال پیام","callback_data":"/order_message_{0}_{1}".format(cart['_id'], orderIndex)},
             {"text":"سفارش آماده ارسال شد","callback_data":"/order_finished_{0}_{1}".format(cart['_id'], orderIndex)}]
             ]}
-    sendMessage(member, message, keyboard)
+
+    messageId = sendMessage(member, message, keyboard)
+
+    sendLocation(cart['address'], messageId, member['_id'])
+
     for f in cart['orders'][orderIndex]['files']:
-        sendFile(member, f['file'], f['type'])
+        sendFile(member, f['file'], f['type'], messageId)
+
+def getAddress(address):
+    if address['text'] == 'none':
+        return ''
+    else:
+        return address['text']
+
+def getDescription(description):
+    if description == 'none':
+        return ''
+    else:
+        return description
+
+def sendLocation(location, messageId, memberId):
+    #    send location
+    inputs = {
+        'chat_id' : str(memberId),
+        'latitude': location['lat'],
+        'longitude': location['lon'],
+        'reply_to_message_id' : messageId
+    }
+    url = 'https://api.telegram.org/bot373573330:AAG6GE-HiDo10VZe7JpMND666Jpdj-ZBp3g/sendLocation?'
+    
+    #{"keyboard":[[{"text": "yes 1"},{"text":"no"}]]}
+    keyboard = json.dumps(keyboard)
+    inputs['reply_markup'] = keyboard
+
+    allowedMessages = json.dumps(["message", "inline_query", "chosen_inline_result", "callback_query"])
+    inputs['allowed_updates'] = allowedMessages
+
+    url += urllib.parse.urlencode(inputs)
+    response = requests.get(url)
