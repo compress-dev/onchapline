@@ -58,8 +58,10 @@ def mainMenu(member, message):
         for cart in collections['orders'].find(
             {
                 'orders.status':{'$not': {'$eq': 'DELIVERED'}},
-                'sender._id' : member['_id'],
-                'orders.product.chat_id' : member['_id']
+                '$or' :[
+                    {'sender._id' : member['_id']},
+                    {'orders.product.chat_id' : member['_id']}
+                ]
             }):
             for i in range(0, len(cart['orders'])):
                 if cart['orders'][i]['status'] != 'DELIVERED':
@@ -112,6 +114,7 @@ def mainMenu(member, message):
         
         Telegram.orderAcceptPrint(member)
         Telegram.orderAcceptMember(cart['sender'], cart, orderIndex)
+        return True
 
     elif message.startswith('/message_order_'):
         parts = message.split("_")
@@ -134,6 +137,8 @@ def mainMenu(member, message):
                 'receiver': receiver
             })
         Telegram.orderMessage(member)
+        return True
+
     elif message.startswith('/refuse_order_'):
         parts = message.split("_")
         cartId = parts[2]
@@ -147,6 +152,19 @@ def mainMenu(member, message):
 
         Telegram.orderRefusePrint(member)
         Telegram.orderRefuseMember(cart['sender'], cart, orderIndex)
+        return True
+
+    if message.startswith('/take_'):
+        product = ServerAPI.getProductById(message.split("_")[1])
+        setState(member, 'order-count', 
+            {
+                'product': product,
+                'search' : member['state_extra']['search'],
+                'offset' : member['state_extra']['offset']
+            })
+        Telegram.productCount(member,product)
+        return True
+
 #   =========================================================================================
 #                                      STATUS FUNCTIONS
 #   =========================================================================================
@@ -194,17 +212,6 @@ def state_search_product_title(member, message):
         for product in products:
             Telegram.product(member, product)
         Telegram.moreProducts(member)
-
-    elif message.startswith('/take_'):
-        product = ServerAPI.getProductById(message.split("_")[1])
-        setState(member, 'order-count', 
-            {
-                'product': product,
-                'search' : member['state_extra']['search'],
-                'offset' : member['state_extra']['offset']
-            })
-        Telegram.productCount(member,product)
-    
     else:
         if isKeyword(message):
             setState(member, 'ready', {})
@@ -272,6 +279,29 @@ def state_order_description(member, message):
             Telegram.orderFile(member, cart)
 #   ====================================  STATE  order file  ========================================
 def state_order_file(member, message):
+    cart = member['state_extra']['cart']
+    if 'document' in message:
+        cart['files'].append({'type': 'document', 'file': message})
+    if 'audio' in message:
+        cart['files'].append({'type': 'audio', 'file': message})
+    if 'photo' in message:
+        cart['files'].append({'type': 'photo', 'file': message})
+    if 'video' in message:
+        cart['files'].append({'type': 'video', 'file': message})
+    if 'voice' in message:
+        cart['files'].append({'type': 'voice', 'file': message})
+    if 'contact' in message:
+        cart['files'].append({'type': 'contact', 'file': message})
+
+    setState(member, 'order-file', 
+        {
+            'search' : member['state_extra']['search'],
+            'offset' : member['state_extra']['offset'],
+            'cart'   : cart
+        })
+    Telegram.orderFileAgain(member, cart)
+
+def state_order_file_text(member, message):
     if mainMenu(member, message):
         return True
     if message == '/cancel':
@@ -288,32 +318,6 @@ def state_order_file(member, message):
         collections['members'].update({'_id': member['_id']}, {"$push" : {'cart' : member['state_extra']['cart']}})
         member['cart'].append(member['state_extra']['cart'])
         Telegram.cartAccept(member, member['cart'])
-    else:
-        if isKeyword(message):
-            setState(member, 'ready', {})
-            state_ready(member, message)
-        else:
-            cart = member['state_extra']['cart']
-            if 'document' in message:
-                cart['files'].append({'type': 'document', 'file': message})
-            if 'audio' in message:
-                cart['files'].append({'type': 'audio', 'file': message})
-            if 'photo' in message:
-                cart['files'].append({'type': 'photo', 'file': message})
-            if 'video' in message:
-                cart['files'].append({'type': 'video', 'file': message})
-            if 'voice' in message:
-                cart['files'].append({'type': 'voice', 'file': message})
-            if 'contact' in message:
-                cart['files'].append({'type': 'contact', 'file': message})
-
-            setState(member, 'order-file', 
-                {
-                    'search' : member['state_extra']['search'],
-                    'offset' : member['state_extra']['offset'],
-                    'cart'   : cart
-                })
-            Telegram.orderFileAgain(member, cart)
 #   ====================================  STATE  cart address message  ========================================
 def state_cart_address_text(member, message):
     if mainMenu(member, message):
@@ -396,7 +400,7 @@ def state_message(member, message, isFile = False):
             orderIndex = int(parts[3])
 
             cart = collections['orders'].find_one({'_id': ObjectId(cartId)})
-            
+            print(cart)
             receiver = 'null'
             if member['_id'] == cart['sender']['_id']:
                 receiverId = cart['orders'][orderIndex]['product']['chat_id']
@@ -412,7 +416,11 @@ def state_message(member, message, isFile = False):
                 })
             Telegram.orderMessage(member)
         else:
-            Telegram.orderTextMessage(member['state_extra']['receiver'], message, member['state_extra']['cart'], orderIndex)
+            if isKeyword(message) != 0:
+                setState(member, 'ready', {})
+                state_ready(member, message)
+            else:
+                Telegram.orderTextMessage(member['state_extra']['receiver'], message, member['state_extra']['cart'], orderIndex)
 
 # ========================================= RESERVED KEYWORDS ===============================================
 def isKeyword(message):

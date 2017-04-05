@@ -23,7 +23,9 @@ def init(clc):
 #   =========================================================================================
 #                                    BASE-LAYERED FUNCTION
 #   =========================================================================================
-def sendMessage(member , message = 'test(keyboard removed)', keyboard = {"remove_keyboard": True}):
+def sendMessage(member , message = 'test(keyboard removed)', keyboard = 'none'):
+    if keyboard == 'none':
+        keyboard = keyboardTemplate['normal']
     memberId = member['_id']
     if debug:
         if 'remove_keyboard' not in keyboard:
@@ -262,7 +264,8 @@ def orderForPrint(cart, orderIndex):
     member = { '_id': cart['orders'][orderIndex]['product']['chat_id']}
     messageId = sendMessage(member, message, keyboard)
 
-    sendLocation(cart['address'], messageId, member['_id'])
+    if cart['address']['lon'] != 0 and cart['address']['lat'] != 0:
+        sendLocation(cart['address'], messageId, member['_id'])
 
     for f in cart['orders'][orderIndex]['files']:
         sendFile(member, f['file'], f['type'], messageId)
@@ -399,13 +402,13 @@ def orderInfoMessage(member, cart, orderIndex):
 
     messageId = sendMessage(member, message, keyboard)
 
-    sendLocation(cart['address'], messageId, member['_id'])
+    if cart['address']['lon'] != 0 and cart['address']['lat'] != 0:
+        sendLocation(cart['address'], messageId, member['_id'])
 
     for f in cart['orders'][orderIndex]['files']:
         sendFile(member, f['file'], f['type'], messageId)
 
 def getAddress(address):
-    print(address)
     if address['text'] == 'none':
         return ''
     else:
