@@ -391,7 +391,7 @@ def state_message(member, message, isFile = False):
         if isFile:
             pass
         elif message.startswith('/message_order_'):
-                    parts = message.split("_")
+            parts = message.split("_")
             cartId = parts[2]
             orderIndex = int(parts[3])
 
