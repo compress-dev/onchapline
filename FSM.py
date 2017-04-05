@@ -55,7 +55,12 @@ def mainMenu(member, message):
         pass
     elif message == "لیست سفارشات در حال اجرا":
         orders = []
-        for cart in collections['orders'].find({'orders.status':{'$not': {'$eq': 'DELIVERED'}}}):
+        for cart in collections['orders'].find(
+            {
+                'orders.status':{'$not': {'$eq': 'DELIVERED'}},
+                'sender._id' : member['_id'],
+                'orders.product.chat_id' : member['_id']
+            }):
             for i in range(0, len(cart['orders'])):
                 if cart['orders'][i]['status'] != 'DELIVERED':
                     Telegram.orderInfoMessage(member, cart, i)
@@ -325,9 +330,31 @@ def state_cart_address_text(member, message):
             #cart['address'] = 
             setState(member, 'cart-accept-ask', 
                 {
-                    'address' : message,
+                    'address' : {
+                        'text' : message,
+                        'lon' : 0,
+                        'lat' : 0
+                    },
                 })
             Telegram.cartAcceptAsk(member, cart)
+def state_cart_address_pos(member, message):
+    if mainMenu(member, message):
+        return True
+    if message == '/cancel':
+        setState(member, 'ready', 
+            {})
+    else:
+        cart = member['cart']
+        #cart['address'] = 
+        setState(member, 'cart-accept-ask', 
+            {
+                'address' : {
+                    'text' : 'none',
+                    'lon' : message['location']['longitude'],
+                    'lat' : message['location']['latitude']
+                },
+            })
+        Telegram.cartAcceptAsk(member, cart)
 #   ====================================  STATE  cart confirm acception  ========================================
 def state_cart_accept(member, message):
     if mainMenu(member, message):
@@ -363,12 +390,29 @@ def state_message(member, message, isFile = False):
             }})
         if isFile:
             pass
-        else:  
-            if isKeyword(message):
-                setState(member, 'ready', {})
-                state_ready(member, message)
+        elif message.startswith('/message_order_'):
+                    parts = message.split("_")
+            cartId = parts[2]
+            orderIndex = int(parts[3])
+
+            cart = collections['orders'].find_one({'_id': ObjectId(cartId)})
+            
+            receiver = 'null'
+            if member['_id'] == cart['sender']['_id']:
+                receiverId = cart['orders'][orderIndex]['product']['chat_id']
+                receiver = collections['members'].find_one({'_id': int(receiverId)})
             else:
-                Telegram.orderTextMessage(member['state_extra']['receiver'], message, member['state_extra']['cart'], orderIndex)
+                receiver = cart['sender']
+            
+            setState(member, 'order-message',
+                {
+                    'cart': cart,
+                    'order-index': orderIndex,
+                    'receiver': receiver
+                })
+            Telegram.orderMessage(member)
+        else:
+            Telegram.orderTextMessage(member['state_extra']['receiver'], message, member['state_extra']['cart'], orderIndex)
 
 # ========================================= RESERVED KEYWORDS ===============================================
 def isKeyword(message):
